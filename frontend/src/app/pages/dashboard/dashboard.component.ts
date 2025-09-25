@@ -75,6 +75,6 @@ export class DashboardComponent {
   constructor(private router: Router) {}
 
   createProject() {
-    console.log('Create project clicked - will be implemented after authentication setup');
+    console.log('Create project clicked');
   }
 }

@@ -9,7 +9,7 @@ A NotebookLM-like application for creating summaries from uploaded documents usi
 - **AI Summarization**: Generate intelligent summaries using OpenAI
 - **Vector Search**: Efficient document chunking and embedding with Cohere
 - **Authentication**: Secure user authentication with Keycloak
-- **Modern UI**: Responsive React frontend with Tailwind CSS
+- **Modern UI**: Responsive Angular frontend with Angular Material
 
 ## Tech Stack
 
@@ -19,12 +19,12 @@ A NotebookLM-like application for creating summaries from uploaded documents usi
 - **Authentication**: Keycloak integration
 - **AI Services**: OpenAI for text generation, Cohere for embeddings
 
-### Frontend (React + TypeScript)
-- **Framework**: React 18 with Vite
-- **Styling**: Tailwind CSS
-- **State Management**: TanStack Query
-- **Routing**: React Router
-- **Authentication**: Keycloak JS
+### Frontend (Angular + TypeScript)
+- **Framework**: Angular 17 with standalone components
+- **UI Library**: Angular Material
+- **State Management**: RxJS
+- **Routing**: Angular Router
+- **Authentication**: Keycloak Angular
 
 ### DevOps
 - **Containerization**: Docker Compose
@@ -81,7 +81,7 @@ dotnet run --project src/NotebookLM.API
 ```bash
 cd frontend
 npm install
-npm run dev
+npm start
 ```
 
 ## Project Structure
@@ -94,12 +94,17 @@ npm run dev
 │   │   ├── NotebookLM.Domain/       # Domain layer
 │   │   └── NotebookLM.Infrastructure/ # Infrastructure layer
 │   └── Dockerfile
-├── frontend/                # React frontend
+├── frontend/                # Angular frontend
 │   ├── src/
-│   │   ├── components/      # Reusable components
-│   │   ├── pages/          # Page components
-│   │   ├── services/       # API services
-│   │   └── types/          # TypeScript types
+│   │   ├── app/
+│   │   │   ├── components/  # Angular components
+│   │   │   ├── pages/      # Page components
+│   │   │   ├── services/   # Angular services
+│   │   │   ├── guards/     # Route guards
+│   │   │   └── models/     # TypeScript interfaces
+│   │   ├── assets/         # Static assets
+│   │   └── environments/   # Environment configs
+│   ├── angular.json        # Angular CLI config
 │   └── Dockerfile
 ├── docker/                 # Docker configuration
 │   └── init-scripts/       # Database initialization

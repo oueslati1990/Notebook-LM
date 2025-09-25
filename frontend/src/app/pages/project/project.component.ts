@@ -29,7 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
         </mat-card-header>
         <mat-card-content>
           <p>This is a placeholder for the project page.</p>
-          <p>Project features will be implemented after authentication is complete.</p>
+          <p>Project features will be implemented next.</p>
         </mat-card-content>
       </mat-card>
     </div>
