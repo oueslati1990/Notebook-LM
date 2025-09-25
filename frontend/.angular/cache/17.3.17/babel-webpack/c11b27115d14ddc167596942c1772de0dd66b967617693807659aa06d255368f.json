@@ -1,0 +1,1 @@
+{"ast":null,"code":"export const environment = {\n  production: false,\n  keycloak: {\n    url: 'http://localhost:8080',\n    realm: 'notebooklm',\n    clientId: 'notebooklm-frontend'\n  },\n  api: {\n    baseUrl: 'http://localhost:5000/api'\n  }\n};","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}
