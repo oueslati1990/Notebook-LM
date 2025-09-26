@@ -45,16 +45,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         var authority = builder.Configuration["Authentication:Authority"];
         options.Authority = authority;
-        options.Audience = "notebooklm-api";
+        options.Audience = "account";
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = authority,
-            ValidateAudience = false,
+            ValidIssuer = "http://localhost:8080/realms/notebooklm", // External issuer for token validation
+            ValidateAudience = true,
+            ValidAudience = "account",
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
+            NameClaimType = "preferred_username", // Map preferred_username to Name
+            RoleClaimType = "realm_access.roles"
         };
     });
 
