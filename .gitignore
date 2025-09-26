@@ -9,6 +9,8 @@ dist/
 build/
 out/
 
+CLAUDE.md
+
 # .NET
 bin/
 obj/

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, UrlTree } from '@angular/router';
+import { Router, UrlTree } from '@angular/router';
 import { KeycloakAuthGuard, KeycloakService } from 'keycloak-angular';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthGuard extends KeycloakAuthGuard {
   constructor(
@@ -14,12 +14,14 @@ export class AuthGuard extends KeycloakAuthGuard {
   }
 
   async isAccessAllowed(): Promise<boolean | UrlTree> {
+    // Force the user to log in if currently unauthenticated.
     if (!this.authenticated) {
       await this.keycloak.login({
         redirectUri: window.location.origin + this.router.url,
       });
     }
 
+    // Allow the user to proceed if authenticated
     return this.authenticated;
   }
 }

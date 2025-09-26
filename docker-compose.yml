@@ -1,7 +1,9 @@
 services:
   # PostgreSQL with PgVector
   postgres:
-    image: pgvector/pgvector:pg16
+    build:
+      context: ./docker/postgres
+      dockerfile: Dockerfile
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -10,9 +12,13 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/init-scripts:/docker-entrypoint-initdb.d
     networks:
       - notebooklm-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Keycloak for Authentication
   keycloak:
@@ -24,15 +30,22 @@ services:
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
       KC_DB_USERNAME: ${DB_USER}
       KC_DB_PASSWORD: ${DB_PASSWORD}
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
     ports:
       - "8080:8080"
-    volumes:
-      - ./docker/keycloak:/opt/keycloak/data/import
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - notebooklm-network
-    command: start-dev --import-realm
+    command: ["start-dev"]
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/8080' && echo 'Keycloak is ready'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
 
   # Backend API (.NET Core)
   backend:
@@ -47,8 +60,10 @@ services:
     ports:
       - "5000:8080"
     depends_on:
-      - postgres
-      - keycloak
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
     networks:
       - notebooklm-network
 
@@ -60,7 +75,12 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - backend
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      backend:
+        condition: service_started
     networks:
       - notebooklm-network
 
