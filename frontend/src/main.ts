@@ -24,7 +24,6 @@ function initializeKeycloak(keycloak: KeycloakService) {
         checkLoginIframeInterval: 5,
         enableLogging: true,
         flow: 'standard',
-        timeout: 10000,
       },
     }).catch(error => {
       console.error('Keycloak initialization failed:', error);
