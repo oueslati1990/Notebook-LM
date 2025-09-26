@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NotebookLM.Domain.Entities;
 using Pgvector.EntityFrameworkCore;
+using Pgvector;
 
 namespace NotebookLM.Infrastructure.Data;
 
