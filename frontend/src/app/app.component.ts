@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { KeycloakService } from 'keycloak-angular';
-import { KeycloakProfile } from 'keycloak-js';
+import { Subject, takeUntil } from 'rxjs';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -62,32 +62,52 @@ import { KeycloakProfile } from 'keycloak-js';
     }
   `]
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'NotebookLM';
   isAuthenticated = false;
   username = '';
+  private destroy$ = new Subject<void>();
 
-  constructor(private keycloakService: KeycloakService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  async ngOnInit() {
-    this.isAuthenticated = await this.keycloakService.isLoggedIn();
+  ngOnInit(): void {
+    // Subscribe to authentication status
+    this.authService.isAuthenticated$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(isAuth => {
+        this.isAuthenticated = isAuth;
+      });
 
-    if (this.isAuthenticated) {
-      try {
-        const userProfile: KeycloakProfile = await this.keycloakService.loadUserProfile();
-        this.username = userProfile.username || userProfile.email || 'User';
-      } catch (error) {
-        console.error('Error loading user profile:', error);
-        this.username = 'User';
+    // Subscribe to current user
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.username = user?.name || user?.email || 'User';
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  login(): void {
+    this.router.navigate(['/login']);
+  }
+
+  logout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+        // Even if logout fails, redirect to login
+        this.router.navigate(['/login']);
       }
-    }
-  }
-
-  login() {
-    this.keycloakService.login();
-  }
-
-  logout() {
-    this.keycloakService.logout(window.location.origin);
+    });
   }
 }

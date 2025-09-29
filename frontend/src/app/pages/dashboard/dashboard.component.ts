@@ -5,7 +5,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { KeycloakService } from 'keycloak-angular';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -119,68 +118,50 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private keycloakService: KeycloakService,
     private authService: AuthService,
     private snackBar: MatSnackBar
   ) {}
 
-  async ngOnInit() {
-    await this.loadUserInfo();
+  ngOnInit() {
+    this.loadUserInfo();
   }
 
-  async loadUserInfo() {
-    try {
-      const currentUser$ = await this.authService.getCurrentUser();
-      currentUser$.subscribe({
-        next: (data) => {
-          this.userInfo = data;
-        },
-        error: (error) => {
-          console.error('Error loading user info:', error);
-          this.snackBar.open('Error loading user information', 'Close', { duration: 3000 });
-        }
-      });
-    } catch (error) {
-      console.error('Error getting user info:', error);
-    }
+  loadUserInfo() {
+    this.authService.getCurrentUser().subscribe({
+      next: (data) => {
+        this.userInfo = data;
+      },
+      error: (error) => {
+        console.error('Error loading user info:', error);
+        this.snackBar.open('Error loading user information', 'Close', { duration: 3000 });
+      }
+    });
   }
 
-  async testApiConnection() {
-    try {
-      const test$ = await this.authService.testApi();
-      test$.subscribe({
-        next: (data) => {
-          this.snackBar.open('API connection successful!', 'Close', { duration: 3000 });
-          console.log('API test response:', data);
-        },
-        error: (error) => {
-          this.snackBar.open('API connection failed', 'Close', { duration: 3000 });
-          console.error('API test error:', error);
-        }
-      });
-    } catch (error) {
-      this.snackBar.open('Error testing API', 'Close', { duration: 3000 });
-      console.error('Error testing API:', error);
-    }
+  testApiConnection() {
+    this.authService.testProtectedEndpoint().subscribe({
+      next: (data) => {
+        this.snackBar.open('API connection successful!', 'Close', { duration: 3000 });
+        console.log('API test response:', data);
+      },
+      error: (error) => {
+        this.snackBar.open('API connection failed', 'Close', { duration: 3000 });
+        console.error('API test error:', error);
+      }
+    });
   }
 
-  async testProtectedEndpoint() {
-    try {
-      const protected$ = await this.authService.testProtectedEndpoint();
-      protected$.subscribe({
-        next: (data) => {
-          this.snackBar.open('Protected endpoint access successful!', 'Close', { duration: 3000 });
-          console.log('Protected endpoint response:', data);
-        },
-        error: (error) => {
-          this.snackBar.open('Protected endpoint access failed', 'Close', { duration: 3000 });
-          console.error('Protected endpoint error:', error);
-        }
-      });
-    } catch (error) {
-      this.snackBar.open('Error accessing protected endpoint', 'Close', { duration: 3000 });
-      console.error('Error accessing protected endpoint:', error);
-    }
+  testProtectedEndpoint() {
+    this.authService.testProtectedEndpoint().subscribe({
+      next: (data) => {
+        this.snackBar.open('Protected endpoint access successful!', 'Close', { duration: 3000 });
+        console.log('Protected endpoint response:', data);
+      },
+      error: (error) => {
+        this.snackBar.open('Protected endpoint access failed', 'Close', { duration: 3000 });
+        console.error('Protected endpoint error:', error);
+      }
+    });
   }
 
   createProject() {
