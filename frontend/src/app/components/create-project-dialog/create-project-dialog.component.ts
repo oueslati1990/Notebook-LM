@@ -59,21 +59,16 @@ export class CreateProjectDialogComponent {
     this.dialogRef.close();
   }
 
-  async create() {
+  create() {
     if (!this.projectData.name) return;
 
-    try {
-      const project$ = await this.projectService.createProject(this.projectData);
-      project$.subscribe({
-        next: (project) => {
-          this.dialogRef.close(project);
-        },
-        error: (error) => {
-          console.error('Error creating project:', error);
-        }
-      });
-    } catch (error) {
-      console.error('Error creating project:', error);
-    }
+    this.projectService.createProject(this.projectData).subscribe({
+      next: (project) => {
+        this.dialogRef.close(project);
+      },
+      error: (error) => {
+        console.error('Error creating project:', error);
+      }
+    });
   }
 }
